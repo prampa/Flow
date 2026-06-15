@@ -81,11 +81,27 @@ class VideoPlayerViewModel @Inject constructor(
     
     private val _commentsState = MutableStateFlow<List<io.github.aedev.flow.data.model.Comment>>(emptyList())
     val commentsState: StateFlow<List<io.github.aedev.flow.data.model.Comment>> = _commentsState.asStateFlow()
+    private val _expandedComments = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+    val expandedComments: StateFlow<Map<String, Boolean>> = _expandedComments.asStateFlow()
+    private val _visibleReplyThreads = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+    val visibleReplyThreads: StateFlow<Map<String, Boolean>> = _visibleReplyThreads.asStateFlow()
 
     private val _isLoadingComments = MutableStateFlow(false)
     val isLoadingComments: StateFlow<Boolean> = _isLoadingComments.asStateFlow()
 
     private var commentsNextPage: org.schabi.newpipe.extractor.Page? = null
+
+    fun setCommentExpanded(commentId: String, expanded: Boolean) {
+        _expandedComments.update { current ->
+            if (expanded) current + (commentId to true) else current - commentId
+        }
+    }
+
+    fun setReplyThreadVisible(commentId: String, visible: Boolean) {
+        _visibleReplyThreads.update { current ->
+            if (visible) current + (commentId to true) else current - commentId
+        }
+    }
 
     private val _hasMoreComments = MutableStateFlow(false)
     val hasMoreComments: StateFlow<Boolean> = _hasMoreComments.asStateFlow()

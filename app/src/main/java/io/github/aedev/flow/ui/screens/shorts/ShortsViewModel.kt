@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.async
@@ -61,6 +62,10 @@ class ShortsViewModel @Inject constructor(
     
     private val _commentsState = MutableStateFlow<List<io.github.aedev.flow.data.model.Comment>>(emptyList())
     val commentsState: StateFlow<List<io.github.aedev.flow.data.model.Comment>> = _commentsState.asStateFlow()
+    private val _expandedComments = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+    val expandedComments: StateFlow<Map<String, Boolean>> = _expandedComments.asStateFlow()
+    private val _visibleReplyThreads = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+    val visibleReplyThreads: StateFlow<Map<String, Boolean>> = _visibleReplyThreads.asStateFlow()
     
     private val _isLoadingComments = MutableStateFlow(false)
     val isLoadingComments: StateFlow<Boolean> = _isLoadingComments.asStateFlow()
@@ -72,6 +77,18 @@ class ShortsViewModel @Inject constructor(
 
     fun clearSnackbar() {
         _snackbarMessage.value = null
+    }
+
+    fun setCommentExpanded(commentId: String, expanded: Boolean) {
+        _expandedComments.update { current ->
+            if (expanded) current + (commentId to true) else current - commentId
+        }
+    }
+
+    fun setReplyThreadVisible(commentId: String, visible: Boolean) {
+        _visibleReplyThreads.update { current ->
+            if (visible) current + (commentId to true) else current - commentId
+        }
     }
     init {
         viewModelScope.launch(PerformanceDispatcher.diskIO) {

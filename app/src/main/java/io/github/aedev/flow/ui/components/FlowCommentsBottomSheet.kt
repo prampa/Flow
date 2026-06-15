@@ -83,6 +83,10 @@ fun FlowCommentsBottomSheet(
     hasMore: Boolean = false,
     onAuthorClick: (String) -> Unit = {},
     onAvatarClick: (String) -> Unit = {},
+    expandedComments: Map<String, Boolean> = emptyMap(),
+    onCommentExpandedChange: (String, Boolean) -> Unit = { _, _ -> },
+    visibleReplyThreads: Map<String, Boolean> = emptyMap(),
+    onReplyThreadVisibilityChange: (String, Boolean) -> Unit = { _, _ -> },
     expandedHeight: Dp? = null,
     modifier: Modifier = Modifier
 ) {
@@ -280,6 +284,14 @@ fun FlowCommentsBottomSheet(
                         ) { comment ->
                             FlowCommentItem(
                                 comment = comment,
+                                isExpanded = expandedComments[comment.id] == true,
+                                onExpandedChange = { expanded ->
+                                    onCommentExpandedChange(comment.id, expanded)
+                                },
+                                isRepliesVisible = visibleReplyThreads[comment.id] == true,
+                                onRepliesVisibleChange = { visible ->
+                                    onReplyThreadVisibilityChange(comment.id, visible)
+                                },
                                 onTimestampClick = onTimestampClick,
                                 onLoadReplies = onLoadReplies,
                                 onLoadMoreReplies = onLoadMoreReplies,
@@ -314,14 +326,16 @@ fun FlowCommentsBottomSheet(
 @Composable
 fun FlowCommentItem(
     comment: Comment,
+    isExpanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    isRepliesVisible: Boolean,
+    onRepliesVisibleChange: (Boolean) -> Unit,
     onTimestampClick: (String) -> Unit,
     onLoadReplies: (Comment) -> Unit,
     onLoadMoreReplies: (Comment) -> Unit,
     onAuthorClick: (String) -> Unit = {},
     onAvatarClick: (String) -> Unit = {}
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
-    var isRepliesVisible by remember { mutableStateOf(false) }
     var isOverflowing by remember { mutableStateOf(false) }
     var isLoadingReplies by remember { mutableStateOf(false) }
     var commentTextLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
@@ -460,7 +474,7 @@ fun FlowCommentItem(
                                         } else if (url != null) {
                                             try { uriHandler.openUri(url.item) } catch (e: Exception) { e.printStackTrace() }
                                         } else {
-                                            if (!isExpanded && isOverflowing) isExpanded = true
+                                            if (!isExpanded && isOverflowing) onExpandedChange(true)
                                         }
                                     }
                                 }
@@ -478,7 +492,7 @@ fun FlowCommentItem(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .padding(top = 4.dp)
-                        .clickable { isExpanded = true }
+                        .clickable { onExpandedChange(true) }
                 )
             }
 
@@ -535,7 +549,7 @@ fun FlowCommentItem(
                                 isLoadingReplies = true
                                 onLoadReplies(comment)
                             }
-                            isRepliesVisible = !isRepliesVisible 
+                            onRepliesVisibleChange(!isRepliesVisible)
                         }
                         .padding(vertical = 4.dp)
                 ) {

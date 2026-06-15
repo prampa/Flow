@@ -154,6 +154,8 @@ fun GlobalPlayerOverlay(
     val completeVideo = rememberCompleteVideo(video, playerUiState)
     val canGoPrevious by playerViewModel.canGoPrevious.collectAsStateWithLifecycle()
     val comments by playerViewModel.commentsState.collectAsStateWithLifecycle()
+    val expandedComments by playerViewModel.expandedComments.collectAsStateWithLifecycle()
+    val visibleReplyThreads by playerViewModel.visibleReplyThreads.collectAsStateWithLifecycle()
     val isLoadingComments by playerViewModel.isLoadingComments.collectAsStateWithLifecycle()
     val hasMoreComments by playerViewModel.hasMoreComments.collectAsStateWithLifecycle()
     val isLoadingMoreComments by playerViewModel.isLoadingMoreComments.collectAsStateWithLifecycle()
@@ -1415,6 +1417,10 @@ fun GlobalPlayerOverlay(
             onLoadMoreReplies = { comment ->
                 playerViewModel.loadMoreCommentReplies(comment)
             },
+            expandedComments = expandedComments,
+            onCommentExpandedChange = playerViewModel::setCommentExpanded,
+            visibleReplyThreads = visibleReplyThreads,
+            onReplyThreadVisibilityChange = playerViewModel::setReplyThreadVisible,
             onNavigateToChannel = { channelId ->
                 onNavigateToChannel(channelId)
             },

@@ -89,6 +89,8 @@ fun ShortsScreen(
     var commentSortFilter by remember { mutableStateOf(CommentSortFilter.TOP) }
     val comments by viewModel.commentsState.collectAsState()
     val isLoadingComments by viewModel.isLoadingComments.collectAsState()
+    val expandedComments by viewModel.expandedComments.collectAsState()
+    val visibleReplyThreads by viewModel.visibleReplyThreads.collectAsState()
 
     fun relativeTimeToSeconds(timeStr: String): Long {
         val lower = timeStr.lowercase().trim()
@@ -333,6 +335,10 @@ fun ShortsScreen(
                 selectedFilter = commentSortFilter,
                 onFilterChanged = { commentSortFilter = it },
                 onLoadReplies = { viewModel.loadCommentReplies(it) },
+                expandedComments = expandedComments,
+                onCommentExpandedChange = viewModel::setCommentExpanded,
+                visibleReplyThreads = visibleReplyThreads,
+                onReplyThreadVisibilityChange = viewModel::setReplyThreadVisible,
                 onAuthorClick = { authorHandle ->
                     showCommentsSheet = false
                     onChannelClick("@$authorHandle")

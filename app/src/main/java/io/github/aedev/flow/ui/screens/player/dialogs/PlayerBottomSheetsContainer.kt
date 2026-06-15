@@ -47,6 +47,10 @@ fun PlayerBottomSheetsContainer(
     onPlayAsMusic: (String) -> Unit,
     onLoadReplies: (Comment) -> Unit = {},
     onLoadMoreReplies: (Comment) -> Unit = {},
+    expandedComments: Map<String, Boolean> = emptyMap(),
+    onCommentExpandedChange: (String, Boolean) -> Unit = { _, _ -> },
+    visibleReplyThreads: Map<String, Boolean> = emptyMap(),
+    onReplyThreadVisibilityChange: (String, Boolean) -> Unit = { _, _ -> },
     onNavigateToChannel: ((String) -> Unit)? = null,
     renderChaptersSheet: Boolean = true
 ) {
@@ -145,6 +149,10 @@ fun PlayerBottomSheetsContainer(
             },
             onLoadReplies = onLoadReplies,
             onLoadMoreReplies = onLoadMoreReplies,
+            expandedComments = expandedComments,
+            onCommentExpandedChange = onCommentExpandedChange,
+            visibleReplyThreads = visibleReplyThreads,
+            onReplyThreadVisibilityChange = onReplyThreadVisibilityChange,
             onTimestampClick = handleTimestampClick,
             isLoadingMore = isLoadingMoreComments,
             hasMore = hasMoreComments,
