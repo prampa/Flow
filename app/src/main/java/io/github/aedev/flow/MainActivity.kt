@@ -48,7 +48,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import io.github.aedev.flow.utils.AppLanguageManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -160,11 +159,6 @@ class MainActivity : ComponentActivity() {
         }
 
         val dataManager = LocalDataManager(applicationContext)
-        val initialThemeMode = runBlocking { dataManager.themeMode.first() }
-        val initialCustomThemeColors = runBlocking { dataManager.customThemeColors.first() }
-        val initialSystemLightThemeMode = runBlocking { dataManager.systemLightThemeMode.first() }
-        val initialSystemDarkThemeMode = runBlocking { dataManager.systemDarkThemeMode.first() }
-
         handleIntent(intent)
 
         
@@ -173,12 +167,22 @@ class MainActivity : ComponentActivity() {
             checkForUpdates(dataManager)
         }
 
-        setContent {
+        lifecycleScope.launch {
+            val initialThemeState = withContext(Dispatchers.IO) {
+                InitialThemeState(
+                    themeMode = dataManager.themeMode.first(),
+                    customThemeColors = dataManager.customThemeColors.first(),
+                    systemLightThemeMode = dataManager.systemLightThemeMode.first(),
+                    systemDarkThemeMode = dataManager.systemDarkThemeMode.first()
+                )
+            }
+
+            setContent {
             val scope = rememberCoroutineScope()
-            var themeMode by remember { mutableStateOf(initialThemeMode) }
-            var customThemeColors by remember { mutableStateOf(initialCustomThemeColors) }
-            var systemLightThemeMode by remember { mutableStateOf(initialSystemLightThemeMode) }
-            var systemDarkThemeMode by remember { mutableStateOf(initialSystemDarkThemeMode) }
+            var themeMode by remember { mutableStateOf(initialThemeState.themeMode) }
+            var customThemeColors by remember { mutableStateOf(initialThemeState.customThemeColors) }
+            var systemLightThemeMode by remember { mutableStateOf(initialThemeState.systemLightThemeMode) }
+            var systemDarkThemeMode by remember { mutableStateOf(initialThemeState.systemDarkThemeMode) }
             // State to control splash visibility
             var showSplash by remember { mutableStateOf(true) }
 
@@ -361,6 +365,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
     }
     
     override fun onDestroy() {
@@ -705,4 +710,11 @@ class MainActivity : ComponentActivity() {
             Log.w("MainActivity", "Could not request battery optimization exemption: ${e.message}")
         }
     }
+
+    private data class InitialThemeState(
+        val themeMode: ThemeMode,
+        val customThemeColors: CustomThemeColors,
+        val systemLightThemeMode: ThemeMode,
+        val systemDarkThemeMode: ThemeMode
+    )
 }
