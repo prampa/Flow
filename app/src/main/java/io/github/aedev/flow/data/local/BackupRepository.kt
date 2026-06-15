@@ -214,6 +214,7 @@ class BackupRepository(private val context: Context) {
         val pkg = context.packageName
         val knownSuffixes = listOf(
             ".IconFlowRed",
+            ".IconFluxRed",
             ".IconFlowLight",
             ".IconAmoled",
             ".IconMonochrome",
@@ -1958,6 +1959,7 @@ class BackupRepository(private val context: Context) {
                     val pkg = context.packageName
                     val allSuffixes = listOf(
                         ".IconFlowRed",
+                        ".IconFluxRed",
                         ".IconFlowLight",
                         ".IconAmoled",
                         ".IconMonochrome",

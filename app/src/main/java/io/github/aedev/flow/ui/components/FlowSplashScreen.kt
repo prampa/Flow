@@ -39,14 +39,15 @@ private data class SplashIconOption(
 )
 
 private val SPLASH_ICONS = listOf(
-    SplashIconOption(".IconFlowRed",    R.drawable.ic_flow_logo),
-    SplashIconOption(".IconFlowLight",  R.drawable.ic_flow_logo),
-    SplashIconOption(".IconAmoled",     R.drawable.splash_icon_amoled),
-    SplashIconOption(".IconMonochrome", R.drawable.splash_icon_monochrome),
-    SplashIconOption(".IconGhost",      R.drawable.splash_icon_ghost),
-    SplashIconOption(".IconDynamic",    R.drawable.ic_launcher_dynamic_foreground, isDynamic = true),
-    SplashIconOption(".IconMaterialSky", R.drawable.ic_flow_logo),
-    SplashIconOption(".IconMaterialMint", R.drawable.ic_flow_logo)
+    SplashIconOption(".IconFlowRed",     R.drawable.flux_icon_default),
+    SplashIconOption(".IconFluxRed",     R.drawable.flux_icon_red),
+    SplashIconOption(".IconFlowLight",   R.drawable.flux_icon_light),
+    SplashIconOption(".IconAmoled",      R.drawable.flux_icon_amoled),
+    SplashIconOption(".IconMonochrome",  R.drawable.flux_icon_monochrome),
+    SplashIconOption(".IconGhost",       R.drawable.flux_icon_ghost),
+    SplashIconOption(".IconDynamic",     R.drawable.flux_icon_dynamic),
+    SplashIconOption(".IconMaterialSky", R.drawable.flux_icon_sky),
+    SplashIconOption(".IconMaterialMint", R.drawable.flux_icon_mint)
 )
 
 @Composable
@@ -136,15 +137,14 @@ fun FlowSplashScreen(
                     ) {
                         Image(
                             painter = painterResource(id = activeIcon.drawableRes),
-                            contentDescription = "Flow Logo",
-                            colorFilter = ColorFilter.tint(colorScheme.onSecondaryContainer),
+                            contentDescription = "Flux.win Logo",
                             modifier = Modifier.fillMaxSize()
                         )
                     }
                 } else {
                     Image(
                         painter = painterResource(id = activeIcon.drawableRes),
-                        contentDescription = "Flow Logo",
+                        contentDescription = "Flux.win Logo",
                         modifier = Modifier
                             .scale(scale.value)
                             .size(90.dp)
@@ -155,7 +155,7 @@ fun FlowSplashScreen(
 
                 // 2. The Text (Optional)
                 Text(
-                    text = "Flow",
+                    text = "Flux.win",
                     color = textColor,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,

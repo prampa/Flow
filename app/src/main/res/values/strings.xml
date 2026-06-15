@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Flow</string>
+    <string name="app_name">Flux.win</string>
     <string name="subscriptions_search_placeholder">Search subscriptions...</string>
     <string name="top_bar_subscriptions_title">Subscriptions</string>
     <string name="view_all_button_label">All</string>
@@ -276,7 +276,7 @@
     <string name="chapters">Chapters</string>
     <string name="artist">Artist</string>
     <string name="playlist">Playlist</string>
-    <string name="app_name_uppercase">FLOW</string>
+    <string name="app_name_uppercase">FLUX.WIN</string>
     <string name="notification_badge_9_plus">9+</string>
     <string name="personalized_feed">Your personalized feed</string>
     <string name="videos_curated_template">%1$d videos curated just for you</string>
@@ -519,8 +519,9 @@
     <string name="app_icon_picker_subtitle">Choose a launcher icon style. The change takes effect immediately and the launcher will briefly refresh.</string>
     <string name="app_icon_picker_warning">Heads up: switching icons uses an Android system mechanism that may briefly remove the app shortcut from your home screen. Long-press the launcher to add it back if needed.</string>
     <string name="app_icon_apply_toast">Icon updated - your launcher will refresh</string>
-    <string name="icon_name_flow_red">Flow Red</string>
-    <string name="icon_name_flow_light">Flow Light</string>
+    <string name="icon_name_flux_default">Flux.win Default</string>
+    <string name="icon_name_flow_red">Flux Red</string>
+    <string name="icon_name_flow_light">Flux Light</string>
     <string name="icon_name_amoled">AMOLED Dark</string>
     <string name="icon_name_monochrome">Monochrome</string>
     <string name="icon_name_ghost">Ghost</string>

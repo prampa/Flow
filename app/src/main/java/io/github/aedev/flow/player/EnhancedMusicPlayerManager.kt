@@ -113,7 +113,7 @@ object EnhancedMusicPlayerManager {
     private val _repeatMode = MutableStateFlow(RepeatMode.OFF)
     val repeatMode: StateFlow<RepeatMode> = _repeatMode.asStateFlow()
     
-    private val _playingFrom = MutableStateFlow("Flow Music")
+    private val _playingFrom = MutableStateFlow("Flux.win Music")
     val playingFrom: StateFlow<String> = _playingFrom.asStateFlow()
     
     private val _isLiked = MutableStateFlow(false)
@@ -282,11 +282,7 @@ object EnhancedMusicPlayerManager {
             
             override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
                 Log.e("EnhancedMusicPlayer", "Player error: ${error.errorCodeName} (${error.errorCode})", error)
-                showPlaybackWarning(
-                    appContext?.getString(io.github.aedev.flow.R.string.music_playback_warning_generic)
-                        ?: "Music playback failed. Try again or switch networks."
-                )
-                retryCount = 0
+                updatePlayerState()
             }
         })
     }
@@ -953,7 +949,7 @@ object EnhancedMusicPlayerManager {
             _currentQueueIndex.value = 0
             clearPendingPlayNext()
             _currentPosition.value = 0L
-            _playingFrom.value = "Flow Music"
+            _playingFrom.value = "Flux.win Music"
             _playerState.value = MusicPlayerState()
             appContext?.let { context ->
                 context.stopService(Intent(context, Media3MusicService::class.java))

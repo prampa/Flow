@@ -367,8 +367,7 @@ class Media3MusicService : MediaLibraryService() {
                 handlePageReloadError(mediaId, currentRetry)
             }
             isExpiredUrlError(error) -> {
-                Log.d(TAG, "Expired URL (403) detected, refreshing stream URL")
-                notifyMusicWarning(getString(R.string.music_playback_warning_forbidden))
+                Log.d(TAG, "Expired or rejected URL detected, refreshing stream URL")
                 handleExpiredUrlError(mediaId, currentRetry)
             }
             isFileNotFoundError(error) -> {
@@ -418,7 +417,7 @@ class Media3MusicService : MediaLibraryService() {
     }
 
     private fun isExpiredUrlError(error: PlaybackException): Boolean {
-        return getHttpResponseCode(error) == 403
+        return getHttpResponseCode(error) in setOf(403, 410)
     }
 
     private fun isRangeNotSatisfiableError(error: PlaybackException): Boolean {
@@ -488,16 +487,17 @@ class Media3MusicService : MediaLibraryService() {
 
     private fun handlePageReloadError(mediaId: String, currentRetry: Int) {
         retryCountMap[mediaId] = currentRetry + 1
+        val currentIndex = player.currentMediaItemIndex
+        val currentPosition = player.currentPosition.coerceAtLeast(0L)
+        val shouldResume = player.playWhenReady
         retryJobCancel()
         pendingRetryJob = serviceScope.launch {
-            delay(BASE_RETRY_DELAY_MS * 2)
+            delay(BASE_RETRY_DELAY_MS)
             try {
-                val currentIndex = player.currentMediaItemIndex
                 if (currentIndex != C.INDEX_UNSET) {
-                    val currentPosition = player.currentPosition
-                    player.seekTo(currentIndex, currentPosition)
+                    refreshCurrentMediaItem(mediaId, currentPosition)
                     player.prepare()
-                    player.play()
+                    player.playWhenReady = shouldResume
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Page reload recovery failed", e)
@@ -507,20 +507,21 @@ class Media3MusicService : MediaLibraryService() {
 
     private fun handleExpiredUrlError(mediaId: String, currentRetry: Int) {
         retryCountMap[mediaId] = currentRetry + 1
+        val currentIndex = player.currentMediaItemIndex
+        val currentPosition = player.currentPosition.coerceAtLeast(0L)
+        val shouldResume = player.playWhenReady
         retryJobCancel()
         pendingRetryJob = serviceScope.launch {
-            delay(BASE_RETRY_DELAY_MS)
+            delay(250L)
             try {
-                val currentIndex = player.currentMediaItemIndex
                 if (currentIndex != C.INDEX_UNSET) {
-                    val currentPosition = player.currentPosition
                     downloadUtil.invalidateUrlCache(mediaId)
                     MusicPlayerUtils.forceRefreshForVideo(mediaId)
                     io.github.aedev.flow.player.EnhancedMusicPlayerManager.invalidateResolvedStream(mediaId)
                     player.stop()
                     refreshCurrentMediaItem(mediaId, currentPosition)
                     player.prepare()
-                    player.play()
+                    player.playWhenReady = shouldResume
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Expired URL recovery failed", e)
@@ -573,7 +574,25 @@ class Media3MusicService : MediaLibraryService() {
     }
 
     private fun handleGenericError(mediaId: String, currentRetry: Int) {
-        scheduleRetry(mediaId, currentRetry, delayMultiplier = 1.5)
+        retryCountMap[mediaId] = currentRetry + 1
+        val currentIndex = player.currentMediaItemIndex
+        val currentPosition = player.currentPosition.coerceAtLeast(0L)
+        val shouldResume = player.playWhenReady
+        val retryDelay = min(BASE_RETRY_DELAY_MS * (1L shl currentRetry), MAX_RETRY_DELAY_MS)
+
+        retryJobCancel()
+        pendingRetryJob = serviceScope.launch {
+            delay(retryDelay)
+            try {
+                if (currentIndex != C.INDEX_UNSET) {
+                    refreshCurrentMediaItem(mediaId, currentPosition)
+                    player.prepare()
+                    player.playWhenReady = shouldResume
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Generic stream recovery failed for $mediaId", e)
+            }
+        }
     }
 
     private fun retryJobCancel() {

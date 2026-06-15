@@ -190,8 +190,8 @@
             android:enabled="true"
             android:exported="false" />
 
-        <!-- App Icon Variants (via activity-alias)                          -->
-        <!-- Default: Flow Red -->
+        <!-- App Icon Variants (via activity-alias) -->
+        <!-- Default: supplied Flux.win artwork -->
         <activity-alias
             android:name=".IconFlowRed"
             android:enabled="true"
@@ -205,7 +205,21 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Flow Light -->
+        <!-- Flux Red -->
+        <activity-alias
+            android:name=".IconFluxRed"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_flux_red"
+            android:roundIcon="@mipmap/ic_launcher_flux_red_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Flux Light -->
         <activity-alias
             android:name=".IconFlowLight"
             android:enabled="false"
