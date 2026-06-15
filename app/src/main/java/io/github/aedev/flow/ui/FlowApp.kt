@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -434,17 +435,9 @@ fun FlowApp(
         }
 
         // ── Floating bottom nav bar overlay ──────────────────────────────────
-        AnimatedVisibility(
+        BottomNavVisibilityLayer(
             visible = !isInPipMode && showBottomNav.value && isNavScrolledVisible,
-            modifier = Modifier.align(Alignment.BottomCenter),
-            enter = slideInVertically(
-                initialOffsetY = { it },
-                animationSpec = spring(dampingRatio = 0.8f, stiffness = 320f)
-            ) + fadeIn(animationSpec = tween(160, delayMillis = 40)),
-            exit = slideOutVertically(
-                targetOffsetY = { it },
-                animationSpec = spring(dampingRatio = 0.85f, stiffness = 350f)
-            ) + fadeOut(animationSpec = tween(120))
+            modifier = Modifier.align(Alignment.BottomCenter)
         ) {
             FloatingBottomNavBar(
                 selectedIndex = selectedBottomNavIndex.intValue,
@@ -479,24 +472,21 @@ fun FlowApp(
         }
     }
 
-    val animatedBottomPaddingRaw by animateDpAsState(
-        targetValue = if (!isInPipMode && showBottomNav.value && isNavScrolledVisible) {
+    val bottomOverlayPadding = (
+        if (!isInPipMode && showBottomNav.value && isNavScrolledVisible) {
             bottomNavContentHeightDp + with(density) { navBarBottomInset.toDp() }
         } else {
             with(density) { navBarBottomInset.toDp() }
-        },
-        animationSpec = tween(220),
-        label = "globalBottomPadding"
-    )
-    val animatedBottomPadding = animatedBottomPaddingRaw.coerceAtLeast(0.dp)
-    val snackbarBottomPadding = (animatedBottomPadding + 12.dp).coerceAtLeast(12.dp)
+        }
+    ).coerceAtLeast(0.dp)
+    val snackbarBottomPadding = (bottomOverlayPadding + 12.dp).coerceAtLeast(12.dp)
 
     // ===== GLOBAL PLAYER OVERLAY =====
     GlobalPlayerOverlay(
         video = activeVideo,
         isVisible = playerVisible,
         playerSheetState = playerSheetState,
-        bottomPadding = animatedBottomPadding,
+        bottomPadding = bottomOverlayPadding,
         miniPlayerScale = miniPlayerScale,
         miniPlayerShowSkipControls = miniPlayerShowSkipControls,
         miniPlayerShowNextPrevControls = miniPlayerShowNextPrevControls,
@@ -535,7 +525,7 @@ fun FlowApp(
     ) {
         MusicPlayerBottomSheet(
             state = musicPlayerSheetState,
-            bottomPadding = animatedBottomPadding,
+            bottomPadding = bottomOverlayPadding,
             onDismiss = {
                 EnhancedMusicPlayerManager.stop()
                 EnhancedMusicPlayerManager.clearCurrentTrack()
@@ -595,6 +585,28 @@ private fun navRouteForIndex(index: Int): String = when (index) {
     5 -> "search"
     6 -> "categories"
     else -> "home"
+}
+
+@Composable
+private fun BottomNavVisibilityLayer(
+    visible: Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    val visibilityProgress by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(durationMillis = if (visible) 160 else 120),
+        label = "bottomNavVisibility"
+    )
+
+    Box(
+        modifier = modifier.graphicsLayer {
+            alpha = visibilityProgress
+            translationY = size.height * (1f - visibilityProgress)
+        }
+    ) {
+        content()
+    }
 }
 
 private fun String.isLibraryOrSettingsRouteForMusicMiniPlayer(): Boolean {
