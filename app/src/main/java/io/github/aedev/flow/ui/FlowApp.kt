@@ -84,7 +84,7 @@ fun FlowApp(
     val playerViewModel: VideoPlayerViewModel = hiltViewModel(activity!!)
     val playerUiStateResult = playerViewModel.uiState.collectAsStateWithLifecycle()
     val playerUiState by playerUiStateResult
-    val playerState by EnhancedPlayerManager.getInstance().playerState.collectAsStateWithLifecycle()
+    val playerManager = remember { EnhancedPlayerManager.getInstance() }
 
     val preferences = remember { PlayerPreferences(context) }
     val isShortsNavigationEnabled by preferences.shortsNavigationEnabled.collectAsState(initial = true)
@@ -237,8 +237,10 @@ fun FlowApp(
     }
 
     LaunchedEffect(Unit) {
-        EnhancedPlayerManager.getInstance().queueAutoAdvanceEvent.collect {
-            keepMiniOnQueueAutoAdvance = playerSheetState.currentValue == PlayerSheetValue.Collapsed
+        playerManager.queueAutoAdvanceEvent.collect {
+            keepMiniOnQueueAutoAdvance =
+                playerSheetState.currentValue == PlayerSheetValue.Collapsed &&
+                    playerManager.playerState.value.queueTitle != null
         }
     }
     
@@ -247,7 +249,6 @@ fun FlowApp(
             playerVisible = true
             val isQueueAutoAdvanceInMiniPlayer =
                 keepMiniOnQueueAutoAdvance &&
-                playerState.queueTitle != null &&
                 playerSheetState.currentValue == PlayerSheetValue.Collapsed
 
             if (
