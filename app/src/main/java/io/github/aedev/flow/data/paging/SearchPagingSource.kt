@@ -1,6 +1,7 @@
 package io.github.aedev.flow.data.paging
 
 import android.util.Log
+import androidx.compose.runtime.Immutable
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import io.github.aedev.flow.data.local.Duration
@@ -24,9 +25,13 @@ import org.schabi.newpipe.extractor.stream.StreamType
  * Sealed class representing any unified search result item.
  * Allows mixing videos, channels, and playlists in a single paged list.
  */
+@Immutable
 sealed class SearchResultItem {
+    @Immutable
     data class VideoResult(val video: Video) : SearchResultItem()
+    @Immutable
     data class ChannelResult(val channel: Channel) : SearchResultItem()
+    @Immutable
     data class PlaylistResult(val playlist: Playlist) : SearchResultItem()
 }
 

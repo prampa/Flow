@@ -1,5 +1,6 @@
 package io.github.aedev.flow.data.local
 
+import androidx.compose.runtime.Immutable
 import android.content.Context
 import android.util.Log
 import androidx.datastore.core.DataStore
@@ -265,6 +266,7 @@ class ViewHistory private constructor(private val context: Context) {
     }
 }
 
+@Immutable
 data class VideoHistoryEntry(
     val videoId: String,
     val position: Long,

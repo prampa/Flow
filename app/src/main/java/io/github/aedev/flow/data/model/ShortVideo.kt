@@ -1,5 +1,6 @@
 package io.github.aedev.flow.data.model
 
+import androidx.compose.runtime.Immutable
 import io.github.aedev.flow.innertube.pages.ShortsItem
 
 /**
@@ -8,6 +9,7 @@ import io.github.aedev.flow.innertube.pages.ShortsItem
  * Separate from [Video] because Shorts have unique fields (musicInfo, sequenceParams,
  * playerParams) and different lifecycle (pre-buffered, looped, vertical-only).
  */
+@Immutable
 data class ShortVideo(
     val id: String,
     val title: String,
@@ -34,6 +36,7 @@ data class ShortVideo(
 /**
  * Music attribution for Shorts ("Original sound - ChannelName" or actual song info).
  */
+@Immutable
 data class ShortMusicInfo(
     val title: String,
     val artist: String,
@@ -43,6 +46,7 @@ data class ShortMusicInfo(
 /**
  * Paginated response from reel sequence endpoint.
  */
+@Immutable
 data class ShortsSequenceResult(
     val shorts: List<ShortVideo>,
     val continuation: String?

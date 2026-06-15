@@ -1,7 +1,9 @@
 package io.github.aedev.flow.data.model
 
+import androidx.compose.runtime.Immutable
 import org.schabi.newpipe.extractor.Page
 
+@Immutable
 data class Video(
     val id: String,
     val title: String,
@@ -23,6 +25,7 @@ data class Video(
     val commentCountText: String = ""
 )
 
+@Immutable
 data class Channel(
     val id: String,
     val name: String,
@@ -34,6 +37,7 @@ data class Channel(
     val url: String = "" // Full channel URL for navigation
 )
 
+@Immutable
 data class Playlist(
     val id: String,
     val name: String,
@@ -56,6 +60,7 @@ data class Comment(
     val isPinned: Boolean = false
 )
 
+@Immutable
 data class SearchResult(
     val videos: List<Video> = emptyList(),
     val channels: List<Channel> = emptyList(),

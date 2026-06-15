@@ -1,5 +1,6 @@
 package io.github.aedev.flow.data.local
 
+import androidx.compose.runtime.Immutable
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -258,6 +259,7 @@ class SubscriptionRepository private constructor(private val context: Context) {
     }
 }
 
+@Immutable
 data class ChannelSubscription(
     val channelId: String,
     val channelName: String,
