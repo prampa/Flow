@@ -1365,6 +1365,9 @@ private fun SearchVideoCard(
                     .fillMaxWidth()
                     .height(60.dp)
                     .align(Alignment.BottomCenter)
+                    .graphicsLayer {
+                        compositingStrategy = CompositingStrategy.Offscreen
+                    }
                     .background(
                         Brush.verticalGradient(
                             listOf(

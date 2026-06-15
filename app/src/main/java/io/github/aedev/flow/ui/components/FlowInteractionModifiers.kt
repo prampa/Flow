@@ -17,6 +17,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 
 /**
@@ -50,19 +51,23 @@ fun Modifier.thumbnailGradientOverlay(
     color: Color = Color.Black,
     alpha: Float = 0.25f,
     startFraction: Float = 0.6f
-): Modifier = this.drawWithContent {
-    drawContent()
-    drawRect(
-        brush = Brush.verticalGradient(
-            colors = listOf(
-                Color.Transparent,
-                color.copy(alpha = alpha)
-            ),
-            startY = size.height * startFraction,
-            endY = size.height
+): Modifier = this
+    .graphicsLayer {
+        compositingStrategy = CompositingStrategy.Offscreen
+    }
+    .drawWithContent {
+        drawContent()
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    Color.Transparent,
+                    color.copy(alpha = alpha)
+                ),
+                startY = size.height * startFraction,
+                endY = size.height
+            )
         )
-    )
-}
+    }
 
 /**
  * Returns a [SheetState] configured for a smooth, polished bottom sheet experience:
