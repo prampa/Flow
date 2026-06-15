@@ -33,6 +33,7 @@ fun ExportDataScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val backupRepo = remember { BackupRepository(context) }
+    var showNeuroExportWarning by remember { mutableStateOf(false) }
 
     val exportAppDataLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -125,6 +126,30 @@ fun ExportDataScreen(
         }
     }
 
+    if (showNeuroExportWarning) {
+        AlertDialog(
+            onDismissRequest = { showNeuroExportWarning = false },
+            text = {
+                Text("FlowNeuro recommendation data is not included. Use Master Backup to include it.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showNeuroExportWarning = false
+                        exportAppDataLauncher.launch("flow_backup_${System.currentTimeMillis()}.json")
+                    }
+                ) {
+                    Text("Continue")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showNeuroExportWarning = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
@@ -180,9 +205,7 @@ fun ExportDataScreen(
                     description = stringResource(R.string.export_app_data_desc),
                     icon = Icons.Outlined.SaveAlt,
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    onClick = {
-                        exportAppDataLauncher.launch("flow_backup_${System.currentTimeMillis()}.json")
-                    }
+                    onClick = { showNeuroExportWarning = true }
                 )
             }
 
