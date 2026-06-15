@@ -309,13 +309,33 @@ fun HomeScreen(
                     bottom = 80.dp
                 )
             }
+            val visibleVideos = remember(
+                uiState.videos,
+                uiState.suppressedVideoIds,
+                uiState.blockedChannelIds
+            ) {
+                uiState.videos.filter { video ->
+                    video.id !in uiState.suppressedVideoIds &&
+                        video.channelId !in uiState.blockedChannelIds
+                }
+            }
+            val visibleShorts = remember(
+                uiState.shorts,
+                uiState.suppressedVideoIds,
+                uiState.blockedChannelIds
+            ) {
+                uiState.shorts.filter { video ->
+                    video.id !in uiState.suppressedVideoIds &&
+                        video.channelId !in uiState.blockedChannelIds
+                }
+            }
 
             when {
                 !homeFeedEnabled -> {
                     FeedDisabledState(modifier = Modifier.fillMaxSize())
                 }
 
-                uiState.isLoading && uiState.videos.isEmpty() -> {
+                uiState.isLoading && visibleVideos.isEmpty() -> {
                     // Initial loading state — matches grid layout
                     LazyVerticalGrid(
                         columns = shimmerGridCells,
@@ -337,7 +357,7 @@ fun HomeScreen(
                     }
                 }
                 
-                uiState.error != null && uiState.videos.isEmpty() -> {
+                uiState.error != null && visibleVideos.isEmpty() -> {
                     ErrorState(
                         message = uiState.error ?: stringResource(R.string.error_occurred),
                         onRetry = { viewModel.retry() }
@@ -353,7 +373,7 @@ fun HomeScreen(
                         horizontalArrangement = horizontalItemSpacing,
                         verticalArrangement = verticalItemSpacing
                     ) {
-                        val videos = uiState.videos
+                        val videos = visibleVideos
                         if (videos.isNotEmpty()) {
                             val insertShortsAfter = layoutConfig.shortsShelfAfterIndex.coerceAtMost(videos.size)
                             
@@ -412,13 +432,13 @@ fun HomeScreen(
                             }
                             
                             // ── Shorts Shelf ──
-                            if (uiState.shorts.isNotEmpty()) {
+                            if (visibleShorts.isNotEmpty()) {
                                 item(
                                     span = { GridItemSpan(maxLineSpan) }, 
                                     key = "shorts_shelf"
                                 ) {
                                     ShortsShelf(
-                                        shorts = uiState.shorts,
+                                        shorts = visibleShorts,
                                         onShortClick = { onShortClick(it) }
                                     )
                                 }
@@ -467,13 +487,13 @@ fun HomeScreen(
                         }
                         
                         // End of feed indicator
-                        if (!uiState.hasMorePages && uiState.videos.size > 100 && !uiState.isLoadingMore) {
+                        if (!uiState.hasMorePages && visibleVideos.size > 100 && !uiState.isLoadingMore) {
                             item(
                                 key = "feed_footer",
                                 span = { GridItemSpan(maxLineSpan) }
                             ) {
                                 FlowFeedFooter(
-                                    videoCount = uiState.videos.size,
+                                    videoCount = visibleVideos.size,
                                     onRefresh = { viewModel.refreshFeed() }
                                 )
                             }

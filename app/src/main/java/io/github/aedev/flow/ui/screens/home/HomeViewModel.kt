@@ -117,8 +117,7 @@ class HomeViewModel @Inject constructor(
                         HomeFeedCache.filterOut(channelId = event.channelId)
                         _uiState.update { state ->
                             state.copy(
-                                videos = state.videos.filter { it.channelId != event.channelId },
-                                shorts = state.shorts.filter { it.channelId != event.channelId }
+                                blockedChannelIds = state.blockedChannelIds + event.channelId
                             )
                         }
                         // Targeted eviction — preserves other channel caches in discovery engine
@@ -128,8 +127,7 @@ class HomeViewModel @Inject constructor(
                         HomeFeedCache.filterOut(videoId = event.videoId)
                         _uiState.update { state ->
                             state.copy(
-                                videos = state.videos.filter { it.id != event.videoId },
-                                shorts = state.shorts.filter { it.id != event.videoId }
+                                suppressedVideoIds = state.suppressedVideoIds + event.videoId
                             )
                         }
                         // Full clear — topic signals changed, discovery queries will differ
@@ -139,8 +137,7 @@ class HomeViewModel @Inject constructor(
                         HomeFeedCache.filterOut(videoId = event.videoId)
                         _uiState.update { state ->
                             state.copy(
-                                videos = state.videos.filter { it.id != event.videoId },
-                                shorts = state.shorts.filter { it.id != event.videoId }
+                                suppressedVideoIds = state.suppressedVideoIds + event.videoId
                             )
                         }
                     }
@@ -773,6 +770,8 @@ internal object HomeFeedCache {
 data class HomeUiState(
     val videos: List<Video> = emptyList(),
     val shorts: List<Video> = emptyList(),
+    val suppressedVideoIds: Set<String> = emptySet(),
+    val blockedChannelIds: Set<String> = emptySet(),
     val continueWatchingVideos: List<io.github.aedev.flow.data.local.VideoHistoryEntry> = emptyList(),
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
