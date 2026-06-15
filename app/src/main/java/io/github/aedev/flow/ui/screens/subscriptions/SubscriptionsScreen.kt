@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import io.github.aedev.flow.R
 import io.github.aedev.flow.data.model.Channel
 import io.github.aedev.flow.data.model.Video
@@ -800,7 +801,10 @@ private fun CreateEditGroupDialog(
                                 }
                             )
                             AsyncImage(
-                                model = channel.thumbnailUrl,
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(channel.thumbnailUrl)
+                                    .size(128, 128)
+                                    .build(),
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(32.dp)
@@ -856,7 +860,10 @@ fun ChannelAvatarItem(
             contentAlignment = Alignment.Center
         ) {
             AsyncImage(
-                model = channel.thumbnailUrl,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(channel.thumbnailUrl)
+                    .size(224, 224)
+                    .build(),
                 contentDescription = channel.name,
                 modifier = Modifier
                     .size(if (isSelected) 48.dp else 56.dp)
@@ -973,7 +980,10 @@ fun SubscriptionManagerItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = channel.thumbnailUrl,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(channel.thumbnailUrl)
+                .size(192, 192)
+                .build(),
             contentDescription = null,
             modifier = Modifier
                 .size(48.dp)

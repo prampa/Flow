@@ -40,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import io.github.aedev.flow.data.local.*
 import io.github.aedev.flow.data.local.SearchFilter
 import io.github.aedev.flow.data.local.SearchHistoryItem
@@ -1446,8 +1447,10 @@ private fun SearchVideoCard(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             AsyncImage(
-                model = video.channelThumbnailUrl.takeIf { it.isNotEmpty() }
-                    ?: Icons.Default.AccountCircle,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(video.channelThumbnailUrl.takeIf { it.isNotEmpty() } ?: Icons.Default.AccountCircle)
+                    .size(136, 136)
+                    .build(),
                 contentDescription = video.channelName,
                 modifier = Modifier
                     .size(34.dp)
@@ -1597,7 +1600,11 @@ private fun SearchChannelCard(
                         )
                 )
                 AsyncImage(
-                    channel.thumbnailUrl, channel.name,
+                    ImageRequest.Builder(LocalContext.current)
+                        .data(channel.thumbnailUrl)
+                        .size(264, 264)
+                        .build(),
+                    channel.name,
                     Modifier
                         .size(66.dp)
                         .clip(CircleShape)
@@ -1659,7 +1666,11 @@ private fun SearchChannelCardCompact(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         AsyncImage(
-            channel.thumbnailUrl, channel.name,
+            ImageRequest.Builder(LocalContext.current)
+                .data(channel.thumbnailUrl)
+                .size(240, 240)
+                .build(),
+            channel.name,
             Modifier
                 .size(60.dp)
                 .clip(CircleShape)
@@ -1697,7 +1708,11 @@ private fun SearchPlaylistCard(
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             AsyncImage(
-                playlist.thumbnailUrl, playlist.name,
+                ImageRequest.Builder(LocalContext.current)
+                    .data(playlist.thumbnailUrl)
+                    .size(560, 315)
+                    .build(),
+                playlist.name,
                 Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
@@ -1775,7 +1790,11 @@ private fun SearchPlaylistCardCompact(
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             AsyncImage(
-                playlist.thumbnailUrl, playlist.name,
+                ImageRequest.Builder(LocalContext.current)
+                    .data(playlist.thumbnailUrl)
+                    .size(560, 315)
+                    .build(),
+                playlist.name,
                 Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )

@@ -54,6 +54,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.aedev.flow.R
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import io.github.aedev.flow.data.local.PlayerPreferences
 import io.github.aedev.flow.data.local.VideoHistoryEntry
 import io.github.aedev.flow.data.local.ViewHistory
@@ -1322,7 +1323,9 @@ fun VideoThumbnailImage(
     model: Any?,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.Fit
+    contentScale: ContentScale = ContentScale.Fit,
+    requestWidth: Int = 640,
+    requestHeight: Int = 360
 ) {
     val models = remember(videoId, model) {
         when {
@@ -1336,7 +1339,9 @@ fun VideoThumbnailImage(
         models = models,
         contentDescription = contentDescription,
         modifier = modifier,
-        contentScale = contentScale
+        contentScale = contentScale,
+        requestWidth = requestWidth,
+        requestHeight = requestHeight
     )
 }
 
@@ -1345,10 +1350,22 @@ private fun SafeAsyncImage(
     models: List<Any>,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.Fit
+    contentScale: ContentScale = ContentScale.Fit,
+    requestWidth: Int,
+    requestHeight: Int
 ) {
     var index by remember(models) { mutableStateOf(0) }
     val currentModel = models.getOrNull(index)
+    val context = LocalContext.current
+    val boundedModel = remember(currentModel, requestWidth, requestHeight) {
+        when (currentModel) {
+            is String, is Int -> ImageRequest.Builder(context)
+                .data(currentModel)
+                .size(requestWidth, requestHeight)
+                .build()
+            else -> currentModel
+        }
+    }
 
     when {
         currentModel is ImageVector -> Image(
@@ -1359,7 +1376,7 @@ private fun SafeAsyncImage(
             colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant)
         )
         (currentModel is String && currentModel.isNotEmpty()) || currentModel is Int -> AsyncImage(
-            model = currentModel,
+            model = boundedModel,
             contentDescription = contentDescription,
             modifier = modifier,
             contentScale = contentScale,
@@ -1383,6 +1400,7 @@ fun ChannelAvatarImage(
     contentDescription: String?,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     var currentModel by remember(url) {
         val highQualityUrl = ThumbnailUrlResolver.resolveChannelAvatar(url)
         val initial = highQualityUrl.takeIf { it.isNotEmpty() } ?: Icons.Default.AccountCircle
@@ -1406,7 +1424,10 @@ fun ChannelAvatarImage(
             )
         )
         else -> AsyncImage(
-            model = model,
+            model = ImageRequest.Builder(context)
+                .data(model)
+                .size(176, 176)
+                .build(),
             contentDescription = contentDescription,
             modifier = modifier,
             contentScale = ContentScale.Crop,
