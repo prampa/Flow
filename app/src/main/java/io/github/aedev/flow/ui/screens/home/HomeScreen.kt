@@ -280,7 +280,35 @@ fun HomeScreen(
         ) {
             val isListView = homeViewMode == io.github.aedev.flow.data.local.HomeViewMode.LIST
             val layoutConfig = rememberHomeLayoutConfig(maxWidth)
-            val gridCells = if (isListView) GridCells.Fixed(1) else GridCells.Fixed(layoutConfig.columns)
+            val gridCells = remember(isListView, layoutConfig.columns) {
+                if (isListView) GridCells.Fixed(1) else GridCells.Fixed(layoutConfig.columns)
+            }
+            val shimmerGridCells = remember(isListView, layoutConfig.shimmerColumns) {
+                if (isListView) GridCells.Fixed(1) else GridCells.Fixed(layoutConfig.shimmerColumns)
+            }
+            val itemSpacing = if (isListView) 0.dp else layoutConfig.cardSpacing
+            val horizontalItemSpacing: Arrangement.Horizontal = remember(itemSpacing) {
+                Arrangement.spacedBy(itemSpacing)
+            }
+            val verticalItemSpacing: Arrangement.Vertical = remember(itemSpacing) {
+                Arrangement.spacedBy(itemSpacing)
+            }
+            val shimmerPadding = remember(isListView, layoutConfig.contentPadding) {
+                PaddingValues(
+                    start = if (isListView) 0.dp else layoutConfig.contentPadding,
+                    end = if (isListView) 0.dp else layoutConfig.contentPadding,
+                    top = 8.dp,
+                    bottom = 80.dp
+                )
+            }
+            val feedPadding = remember(isListView, layoutConfig.contentPadding) {
+                PaddingValues(
+                    start = if (isListView) 0.dp else layoutConfig.contentPadding,
+                    end = if (isListView) 0.dp else layoutConfig.contentPadding,
+                    top = 4.dp,
+                    bottom = 80.dp
+                )
+            }
 
             when {
                 !homeFeedEnabled -> {
@@ -290,16 +318,11 @@ fun HomeScreen(
                 uiState.isLoading && uiState.videos.isEmpty() -> {
                     // Initial loading state — matches grid layout
                     LazyVerticalGrid(
-                        columns = if (isListView) GridCells.Fixed(1) else GridCells.Fixed(layoutConfig.shimmerColumns),
+                        columns = shimmerGridCells,
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            start = if (isListView) 0.dp else layoutConfig.contentPadding,
-                            end = if (isListView) 0.dp else layoutConfig.contentPadding,
-                            top = 8.dp,
-                            bottom = 80.dp
-                        ),
-                        horizontalArrangement = Arrangement.spacedBy(if (isListView) 0.dp else layoutConfig.cardSpacing),
-                        verticalArrangement = Arrangement.spacedBy(if (isListView) 0.dp else layoutConfig.cardSpacing),
+                        contentPadding = shimmerPadding,
+                        horizontalArrangement = horizontalItemSpacing,
+                        verticalArrangement = verticalItemSpacing,
                         userScrollEnabled = false
                     ) {
                         items(12) {
@@ -326,14 +349,9 @@ fun HomeScreen(
                         columns = gridCells,
                         modifier = Modifier.fillMaxSize(),
                         state = gridState,
-                        contentPadding = PaddingValues(
-                            start = if (isListView) 0.dp else layoutConfig.contentPadding,
-                            end = if (isListView) 0.dp else layoutConfig.contentPadding,
-                            top = 4.dp, 
-                            bottom = 80.dp
-                        ),
-                        horizontalArrangement = Arrangement.spacedBy(if (isListView) 0.dp else layoutConfig.cardSpacing),
-                        verticalArrangement = Arrangement.spacedBy(if (isListView) 0.dp else layoutConfig.cardSpacing)
+                        contentPadding = feedPadding,
+                        horizontalArrangement = horizontalItemSpacing,
+                        verticalArrangement = verticalItemSpacing
                     ) {
                         val videos = uiState.videos
                         if (videos.isNotEmpty()) {
